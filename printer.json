@@ -1,5 +1,6 @@
 {
   "_comment": "Everything machine-specific in one place. The 'machine' section provides defaults for the s4_pipeline.py / s4_to_stewart.py options of the same names (CLI flags always win). 'start_gcode'/'end_gcode' replace the emitted header/footer ({temp} and {lift_z} placeholders; write literal braces as {{ }}). 'cura_overrides' are Cura settings applied on top of cura_config.3mf.",
+  "_machine_notes": "max_tilt/max_clearance/nozzle_offset are physical measurements - see README 'Checklist: making it print on YOUR machine'. nozzle_offset is the upstream S4 printer's pivot-to-tip arm and cancels out of the Stewart output; leave it unless you print the intermediate 4-axis file.",
   "machine": {
     "mode": "tilt-signed",
     "max_tilt": 20.0,

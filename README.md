@@ -115,7 +115,49 @@ full resolution for most models.
 
 ## Configuring your printer
 
-Everything machine-specific is in **[`printer.json`](printer.json)**:
+### Checklist: making it print on YOUR machine
+
+Everything below lives in [`printer.json`](printer.json) unless noted.
+
+1. **Build volume & nozzle** — set `machine_width` / `machine_depth` /
+   `machine_height`, `machine_nozzle_size` + `line_width`, and
+   `machine_center_is_zero` (true if your firmware puts X0 Y0 at the bed
+   center — typical for rotary/delta-style machines; false for a corner-homed
+   Cartesian) in `cura_overrides`.
+2. **`max_tilt`** — the tilt your platform/head can actually reach, in
+   degrees. This is a physical limit of your machine; measure or take it
+   from your design.
+3. **`max_clearance`** — how much free cone there is around your nozzle tip
+   before the hotend body/fan shroud would touch the printed part: put a
+   protractor (or CAD section) at the tip and measure the half-angle. Fatter
+   hotends need smaller values.
+4. **`temp`**, **`print_cap`**, **`speed_scale`** — your filament and your
+   machine's comfortable speeds.
+5. **`start_gcode` / `end_gcode`** — replace with your homing/heating
+   sequence. These are emitted verbatim into the final file.
+6. **Firmware / pose mode** — `tilt-signed` needs shortest-path rotary
+   handling ([docs/FIRMWARE-POSE-CHANGES.md](docs/FIRMWARE-POSE-CHANGES.md)).
+   On stock firmware use `"mode": "tilt"`; on a plain 3-axis printer with
+   generous Z, `"mode": "3axis"` works as a nonplanar slicer with a vertical
+   nozzle.
+7. **Not a Stewart platform?** If your G-code dialect or axis meaning
+   differs (say `B C` rotary words, or a tilting head instead of a tilting
+   bed), copy `kinematics_example.py` and adapt it — see
+   [Custom kinematics](#custom-kinematics).
+8. **`nozzle_offset` — usually leave it at 42.** It is the pivot-to-tip arm
+   of the *original* S4 4-axis printer (Joshua Bird's machine; his notebook
+   notes the true value is 41.5). It is baked into the intermediate
+   `s4_4axis.gcode` by stage 3 and removed again by stage 4, so it cancels
+   out of the final pose G-code — the value only matters if you print the
+   intermediate 4-axis file directly on a tilting-nozzle machine (then set
+   it to your measured pivot-to-tip distance).
+
+The near-bed settings (`bed_safe_z`, `tilt_ramp`, `bed_phase`,
+`out_travel_hop`) have sensible defaults; touch them only if the nozzle
+grazes the bed or the part while tilted low.
+
+### The file
+
 
 ```jsonc
 {
@@ -123,7 +165,9 @@ Everything machine-specific is in **[`printer.json`](printer.json)**:
     "mode": "tilt-signed",  // pose mode (see below)
     "max_tilt": 20.0,       // deg - see "The two key angles"
     "max_clearance": 25.0,  // deg
-    "nozzle_offset": 42.0,  // mm, pivot-to-nozzle-tip arm of your head/platform
+    "nozzle_offset": 42.0,  // mm; upstream S4 printer's pivot-to-tip arm.
+                            //  Cancels out of the Stewart output - see the
+                            //  checklist before changing it
     "out_travel_hop": 2.0,  // mm hop added to travel moves
     "bed_safe_z": 1.0,      // mm below which the nozzle stays vertical
     "tilt_ramp": 0.5,       // mm band over which tilt fades back in above that
