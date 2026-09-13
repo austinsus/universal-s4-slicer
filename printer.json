@@ -1,0 +1,42 @@
+{
+  "_comment": "Everything machine-specific in one place. The 'machine' section provides defaults for the s4_pipeline.py / s4_to_stewart.py options of the same names (CLI flags always win). 'start_gcode'/'end_gcode' replace the emitted header/footer ({temp} and {lift_z} placeholders; write literal braces as {{ }}). 'cura_overrides' are Cura settings applied on top of cura_config.3mf.",
+  "machine": {
+    "mode": "tilt-signed",
+    "max_tilt": 20.0,
+    "max_clearance": 25.0,
+    "nozzle_offset": 42.0,
+    "out_travel_hop": 2.0,
+    "bed_safe_z": 1.0,
+    "tilt_ramp": 0.5,
+    "bed_phase": "off",
+    "speed_scale": 1.0,
+    "print_cap": 10.0,
+    "temp": 200.0
+  },
+  "start_gcode": [
+    "G21 ; mm",
+    "G90 ; absolute coordinates",
+    "M83 ; relative extrusion",
+    "G28 ; home",
+    "M109 S{temp:g} ; heat and wait",
+    "G1 E10 F300 ; prime",
+    "G0 Z20 A0 B0 F6000 ; start pose"
+  ],
+  "end_gcode": [
+    "M107 ; fan off",
+    "M104 S0 ; heater off",
+    "G0 Z{lift_z:.1f} F6000 ; lift",
+    "G0 A0 B0 F6000 ; level",
+    "M84 ; motors off"
+  ],
+  "cura_overrides": {
+    "machine_nozzle_size": 0.4,
+    "line_width": 0.4,
+    "layer_height": 0.2,
+    "machine_width": 200,
+    "machine_depth": 200,
+    "machine_height": 150,
+    "machine_shape": "rectangular",
+    "machine_center_is_zero": true
+  }
+}
